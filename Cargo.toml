@@ -10,3 +10,4 @@ evtx = "0.8.0"
 clap = { version = "4.0.26", features = ["derive"] }
 tokio = "1.22.0"
 datafusion = "14.0.0" 
+rustyline = "10.0.0"
