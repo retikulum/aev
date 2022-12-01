@@ -10,7 +10,7 @@ struct Args {
     file: String,
     #[arg(long)]
     folder: Option<String>,
-    #[arg(long,  default_value_t = String::from(""))]
+    #[arg(long)]
     table_name: String,
     #[arg(long, default_value_t = String::from(""))]
     query: String,

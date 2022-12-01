@@ -20,6 +20,17 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
     let mut subject_user_name_vec: Vec<String> = Vec::new();
     let mut new_process_name_vec: Vec<String> = Vec::new();
     let mut parent_process_name_vec: Vec<String> = Vec::new();
+    let mut handle_id_vec: Vec<String> = Vec::new();
+    let mut object_name_vec: Vec<String> = Vec::new();
+    let mut object_server_vec: Vec<String> = Vec::new();
+    let mut object_type_vec: Vec<String> = Vec::new();
+    let mut privilige_list_vec: Vec<String> = Vec::new();
+    let mut proc_id_vec: Vec<String> = Vec::new();
+    let mut subject_domain_name_vec: Vec<String> = Vec::new();
+    let mut subject_logon_id_vec: Vec<String> = Vec::new();
+    let mut subject_user_sid_vec: Vec<String> = Vec::new();
+    let mut channel_vec: Vec<String> = Vec::new();
+    let mut computer_vec: Vec<String> = Vec::new();
 
     for record in parser.records_json_value() {
         match record {
@@ -37,6 +48,28 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
                     .push(r.data["Event"]["EventData"]["NewProcessName"].to_string());
                 parent_process_name_vec
                     .push(r.data["Event"]["EventData"]["ParentProcessName"].to_string());
+                handle_id_vec
+                    .push(r.data["Event"]["EventData"]["HandleId"].to_string());
+                object_name_vec
+                    .push(r.data["Event"]["EventData"]["ObjectName"].to_string());
+                object_server_vec
+                    .push(r.data["Event"]["EventData"]["ObjectServer"].to_string());
+                object_type_vec
+                    .push(r.data["Event"]["EventData"]["ObjectType"].to_string());
+                privilige_list_vec
+                    .push(r.data["Event"]["EventData"]["PriviligeList"].to_string());
+                proc_id_vec
+                    .push(r.data["Event"]["EventData"]["ProcessId"].to_string());
+                subject_domain_name_vec
+                    .push(r.data["Event"]["EventData"]["SubjectDomainName"].to_string());
+                subject_logon_id_vec
+                    .push(r.data["Event"]["EventData"]["SubjectLoginId"].to_string());
+                subject_user_sid_vec
+                    .push(r.data["Event"]["EventData"]["SubjectUserSid"].to_string());
+                channel_vec
+                    .push(r.data["Event"]["System"]["Channel"].to_string());
+                computer_vec
+                    .push(r.data["Event"]["System"]["Computer"].to_string());
                 //println!("{}", r.data);
             }
             Err(e) => eprintln!("{}", e),
@@ -49,6 +82,17 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
     let subjectusername_array = StringArray::from(subject_user_name_vec);
     let new_procname_array = StringArray::from(new_process_name_vec);
     let parent_procname_array = StringArray::from(parent_process_name_vec);
+    let handle_id_array = StringArray::from(handle_id_vec);
+    let object_name_array = StringArray::from(object_name_vec);
+    let object_server_array = StringArray::from(object_server_vec);
+    let object_type_array = StringArray::from(object_type_vec);
+    let privilige_list_array = StringArray::from(privilige_list_vec);
+    let proc_id_array = StringArray::from(proc_id_vec);
+    let subject_domain_name_array = StringArray::from(subject_domain_name_vec);
+    let subject_logon_id_array = StringArray::from(subject_logon_id_vec);
+    let subject_user_sid_array = StringArray::from(subject_user_sid_vec);
+    let channel_array = StringArray::from(channel_vec);
+    let computer_array = StringArray::from(computer_vec);
 
     Ok(RecordBatch::try_new(
         get_schema(),
@@ -59,17 +103,39 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
             Arc::new(access_mask_array),
             Arc::new(new_procname_array),
             Arc::new(parent_procname_array),
+            Arc::new(handle_id_array),
+            Arc::new(object_name_array),
+            Arc::new(object_server_array),
+            Arc::new(object_type_array),
+            Arc::new(privilige_list_array),
+            Arc::new(proc_id_array),
+            Arc::new(subject_domain_name_array),
+            Arc::new(subject_logon_id_array),
+            Arc::new(subject_user_sid_array),
+            Arc::new(channel_array),
+            Arc::new(computer_array),
         ],
     )?)
 }
 
 fn get_schema() -> SchemaRef {
     SchemaRef::new(Schema::new(vec![
-        Field::new("id", DataType::UInt64, false),
-        Field::new("process_name", DataType::Utf8, true),
-        Field::new("subject_user_name", DataType::Utf8, true),
-        Field::new("access_mask_name", DataType::Utf8, false),
-        Field::new("new_process_name", DataType::Utf8, false),
-        Field::new("parent_process_name", DataType::Utf8, false),
+        Field::new("EventID", DataType::UInt64, false),
+        Field::new("ProcessName", DataType::Utf8, true),
+        Field::new("SubjectUserName", DataType::Utf8, true),
+        Field::new("AccessMaskName", DataType::Utf8, false),
+        Field::new("NewProcessName", DataType::Utf8, false),
+        Field::new("ParentProcessName", DataType::Utf8, false),
+        Field::new("HandleId", DataType::Utf8, false),
+        Field::new("ObjectName", DataType::Utf8, false),
+        Field::new("ObjectServer", DataType::Utf8, false),
+        Field::new("ObjectType", DataType::Utf8, false),
+        Field::new("PriviligeList", DataType::Utf8, false),
+        Field::new("ProcessId", DataType::Utf8, false),
+        Field::new("SubjectDomainName", DataType::Utf8, false),
+        Field::new("SubjectLogonId", DataType::Utf8, false),
+        Field::new("SubjectUserSid", DataType::Utf8, false),
+        Field::new("Channel", DataType::Utf8, false),
+        Field::new("Computer", DataType::Utf8, false),
     ]))
 }
