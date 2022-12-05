@@ -28,13 +28,13 @@ pub async fn interactive_mode() -> Result<()> {
                     let line_as_seperated = line.split_at(space_index + 1);
                     let first_word = line_as_seperated.0.to_lowercase();
                     let second_word = line_as_seperated.1.to_string();
-                    println!("second word: {}", second_word);
+                    //println!("second word: {}", second_word);
                     if first_word == "file " {
                         filename = second_word;
                     } else if first_word == "table_name " {
                         // check filename. it shouldnt be the same as default
                         if filename.ne("") {
-                            println!("{}", filename);
+                            //println!("{}", filename);
                             //create table with filename and table name
                             if let Ok(table) = create_memtable(filename.to_owned()) {
                                 ctx.register_table(second_word.as_str(), Arc::new(table))

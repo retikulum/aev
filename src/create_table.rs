@@ -1,4 +1,4 @@
-use datafusion::arrow::array::{StringArray, UInt64Array};
+use datafusion::arrow::array::StringArray;
 use datafusion::arrow::datatypes::{DataType, Field, Schema, SchemaRef};
 use datafusion::arrow::record_batch::RecordBatch;
 use datafusion::datasource::MemTable;
@@ -15,7 +15,7 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
     let mut parser = EvtxParser::from_path(filename).unwrap();
     let mut access_mask_vec: Vec<String> = Vec::new();
     let mut id_vec: Vec<u64> = Vec::new();
-    let mut event_id_vec: Vec<u64> = Vec::new();
+    let mut event_id_vec: Vec<String> = Vec::new();
     let mut procname_vec: Vec<String> = Vec::new();
     let mut subject_user_name_vec: Vec<String> = Vec::new();
     let mut new_process_name_vec: Vec<String> = Vec::new();
@@ -37,9 +37,7 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
             Ok(r) => {
                 // Parse fields of record
                 id_vec.push(r.event_record_id);
-                if let Some(val) = r.data["Event"]["System"]["EventID"].as_u64() {
-                    event_id_vec.push(val);
-                }
+                event_id_vec.push(r.data["Event"]["System"]["EventID"].to_string());
                 procname_vec.push(r.data["Event"]["EventData"]["ProcessName"].to_string());
                 subject_user_name_vec
                     .push(r.data["Event"]["EventData"]["SubjectUserName"].to_string());
@@ -77,7 +75,7 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
     }
 
     let access_mask_array = StringArray::from(access_mask_vec);
-    let id_array = UInt64Array::from(event_id_vec);
+    let id_array = StringArray::from(event_id_vec);
     let procname_array = StringArray::from(procname_vec);
     let subjectusername_array = StringArray::from(subject_user_name_vec);
     let new_procname_array = StringArray::from(new_process_name_vec);
@@ -120,22 +118,22 @@ fn create_record_batch(filename: String) -> Result<RecordBatch> {
 
 fn get_schema() -> SchemaRef {
     SchemaRef::new(Schema::new(vec![
-        Field::new("EventID", DataType::UInt64, false),
-        Field::new("ProcessName", DataType::Utf8, true),
-        Field::new("SubjectUserName", DataType::Utf8, true),
-        Field::new("AccessMaskName", DataType::Utf8, false),
-        Field::new("NewProcessName", DataType::Utf8, false),
-        Field::new("ParentProcessName", DataType::Utf8, false),
-        Field::new("HandleId", DataType::Utf8, false),
-        Field::new("ObjectName", DataType::Utf8, false),
-        Field::new("ObjectServer", DataType::Utf8, false),
-        Field::new("ObjectType", DataType::Utf8, false),
-        Field::new("PriviligeList", DataType::Utf8, false),
-        Field::new("ProcessId", DataType::Utf8, false),
-        Field::new("SubjectDomainName", DataType::Utf8, false),
-        Field::new("SubjectLogonId", DataType::Utf8, false),
-        Field::new("SubjectUserSid", DataType::Utf8, false),
-        Field::new("Channel", DataType::Utf8, false),
-        Field::new("Computer", DataType::Utf8, false),
+        Field::new("eventid", DataType::Utf8, false),
+        Field::new("processname", DataType::Utf8, true),
+        Field::new("subjectusername", DataType::Utf8, true),
+        Field::new("accessmaskname", DataType::Utf8, false),
+        Field::new("newprocessname", DataType::Utf8, false),
+        Field::new("parentprocessname", DataType::Utf8, false),
+        Field::new("handleid", DataType::Utf8, false),
+        Field::new("objectname", DataType::Utf8, false),
+        Field::new("objectserver", DataType::Utf8, false),
+        Field::new("objecttype", DataType::Utf8, false),
+        Field::new("priviligelist", DataType::Utf8, false),
+        Field::new("processid", DataType::Utf8, false),
+        Field::new("subjectdomainname", DataType::Utf8, false),
+        Field::new("subjectlogonid", DataType::Utf8, false),
+        Field::new("subjectusersid", DataType::Utf8, false),
+        Field::new("channel", DataType::Utf8, false),
+        Field::new("computer", DataType::Utf8, false),
     ]))
 }

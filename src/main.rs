@@ -10,7 +10,7 @@ struct Args {
     file: String,
     #[arg(long)]
     folder: Option<String>,
-    #[arg(long)]
+    #[arg(long) ]
     table_name: String,
     #[arg(long, default_value_t = String::from(""))]
     query: String,
@@ -31,7 +31,9 @@ async fn main() -> Result<(), DataFusionError> {
         interactive_mode().await.unwrap();
     } else {
         //println!("Query: {}", query);
-
+        println!("File {:?}", &file);
+        println!("Query {:?}", query);
+        println!("table-name {}", table_name);
         let mem_table = create_memtable(file)?;
 
         // create local execution context
